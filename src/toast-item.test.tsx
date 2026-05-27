@@ -1,0 +1,293 @@
+import {act, fireEvent, render, screen} from '@testing-library/react';
+import {configureAxe} from 'jest-axe';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {ToastItem} from './toast-item';
+import {toast} from './toast-queue';
+import type {ToastItem as ToastItemType} from './types';
+
+function makeItem(overrides: Partial<ToastItemType> = {}): ToastItemType {
+	return {
+		id: 'test-id',
+		title: 'Test toast',
+		variant: 'info',
+		timeout: 5000,
+		...overrides,
+	};
+}
+
+beforeEach(() => {
+	vi.useFakeTimers();
+	vi.spyOn(toast, 'dismiss');
+});
+
+afterEach(() => {
+	vi.restoreAllMocks();
+	vi.useRealTimers();
+});
+
+describe('timer logic', () => {
+	it('auto-dismisses after timeout ms', () => {
+		render(<ToastItem item={makeItem({timeout: 3000})} />);
+		expect(toast.dismiss).not.toHaveBeenCalled();
+		act(() => {
+			vi.advanceTimersByTime(3000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('timeout: false never auto-dismisses', () => {
+		render(<ToastItem item={makeItem({timeout: false})} />);
+		act(() => {
+			vi.advanceTimersByTime(60000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+	});
+
+	it('onMouseEnter pauses and onMouseLeave resumes timer', () => {
+		render(<ToastItem item={makeItem({timeout: 5000})} />);
+		const rootDiv = screen.getByRole('status');
+
+		act(() => {
+			vi.advanceTimersByTime(2000);
+		});
+		fireEvent.mouseEnter(rootDiv);
+
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+
+		fireEvent.mouseLeave(rootDiv);
+		act(() => {
+			vi.advanceTimersByTime(3000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+});
+
+describe('slotProps merging', () => {
+	it('slotProps.closeButton aria-label overrides default', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				slotProps={{closeButton: {'aria-label': 'Lukk varsel'}}}
+			/>,
+		);
+		expect(
+			screen.getByRole('button', {name: 'Lukk varsel'}),
+		).toBeInTheDocument();
+	});
+
+	it('default close button aria-label is "Close notification"', () => {
+		render(<ToastItem item={makeItem()} />);
+		expect(
+			screen.getByRole('button', {name: 'Close notification'}),
+		).toBeInTheDocument();
+	});
+
+	it('slotProps.root.className is merged onto the root element', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				slotProps={{root: {className: 'my-custom-class'}}}
+			/>,
+		);
+		const rootDiv = screen.getByRole('status');
+		expect(rootDiv).toHaveClass('my-custom-class');
+		expect(rootDiv).toHaveClass('toast-item');
+	});
+
+	it('slotProps.closeButton.onClick fires in addition to dismiss', () => {
+		const extraOnClick = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem()}
+				slotProps={{closeButton: {onClick: extraOnClick}}}
+			/>,
+		);
+		fireEvent.click(
+			screen.getByRole('button', {name: 'Close notification'}),
+		);
+		expect(extraOnClick).toHaveBeenCalledTimes(1);
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+});
+
+describe('variantSlotProps merging', () => {
+	it('variantSlotProps className is applied for the matching variant', () => {
+		render(
+			<ToastItem
+				item={makeItem({variant: 'success'})}
+				variantSlotProps={{root: {className: 'success-custom'}}}
+			/>,
+		);
+		expect(screen.getByRole('status')).toHaveClass('success-custom');
+	});
+
+	it('variantSlotProps className is merged with slotProps className', () => {
+		render(
+			<ToastItem
+				item={makeItem({variant: 'success'})}
+				slotProps={{root: {className: 'global-class'}}}
+				variantSlotProps={{root: {className: 'variant-class'}}}
+			/>,
+		);
+		const root = screen.getByRole('status');
+		expect(root).toHaveClass('global-class');
+		expect(root).toHaveClass('variant-class');
+	});
+
+	it('variantSlotProps style is merged with slotProps style', () => {
+		render(
+			<ToastItem
+				item={makeItem({variant: 'error'})}
+				slotProps={{root: {style: {opacity: '0.9'}}}}
+				variantSlotProps={{root: {style: {fontWeight: 'bold'}}}}
+			/>,
+		);
+		const root = screen.getByRole('alert');
+		expect(root).toHaveStyle({opacity: '0.9', fontWeight: 'bold'});
+	});
+
+	it('variantSlotProps style overrides the same key from slotProps', () => {
+		render(
+			<ToastItem
+				item={makeItem({variant: 'warning'})}
+				slotProps={{root: {style: {opacity: '0.5'}}}}
+				variantSlotProps={{root: {style: {opacity: '1'}}}}
+			/>,
+		);
+		expect(screen.getByRole('alert')).toHaveStyle({opacity: '1'});
+	});
+});
+
+const configuredAxe = configureAxe({
+	rules: {'color-contrast': {enabled: false}},
+});
+
+describe('accessibility', () => {
+	beforeEach(() => {
+		vi.useRealTimers();
+	});
+	afterEach(() => {
+		vi.useFakeTimers();
+	});
+
+	it('error variant sets role="alert"', () => {
+		render(<ToastItem item={makeItem({variant: 'error'})} />);
+		expect(screen.getByRole('alert')).toBeInTheDocument();
+	});
+
+	it('warning variant sets role="alert"', () => {
+		render(<ToastItem item={makeItem({variant: 'warning'})} />);
+		expect(screen.getByRole('alert')).toBeInTheDocument();
+	});
+
+	it('info variant sets role="status"', () => {
+		render(<ToastItem item={makeItem({variant: 'info'})} />);
+		expect(screen.getByRole('status')).toBeInTheDocument();
+	});
+
+	it('success variant sets role="status"', () => {
+		render(<ToastItem item={makeItem({variant: 'success'})} />);
+		expect(screen.getByRole('status')).toBeInTheDocument();
+	});
+
+	it('root element has aria-atomic="true"', () => {
+		render(<ToastItem item={makeItem({variant: 'info'})} />);
+		expect(screen.getByRole('status')).toHaveAttribute(
+			'aria-atomic',
+			'true',
+		);
+	});
+
+	it('icon wrapper has aria-hidden="true"', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				resolvedIcon={<span data-testid="test-icon" />}
+			/>,
+		);
+		const iconWrapper = document.querySelector('span[aria-hidden="true"]');
+		expect(iconWrapper).toBeInTheDocument();
+	});
+
+	it('close button SVG is aria-hidden', () => {
+		render(<ToastItem item={makeItem()} />);
+		const svg = document.querySelector('svg[aria-hidden]');
+		expect(svg).toBeInTheDocument();
+	});
+
+	it('timer pauses on keyboard focus and resumes on blur', () => {
+		vi.useFakeTimers();
+		render(<ToastItem item={makeItem({variant: 'info', timeout: 5000})} />);
+		const root = screen.getByRole('status');
+
+		act(() => {
+			vi.advanceTimersByTime(2000);
+		});
+		fireEvent.focus(root);
+
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+
+		fireEvent.blur(root);
+		act(() => {
+			vi.advanceTimersByTime(3000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('error variant passes axe audit', async () => {
+		const {container} = render(
+			<ol>
+				<ToastItem
+					item={makeItem({variant: 'error', title: 'Error message'})}
+				/>
+			</ol>,
+		);
+		expect(await configuredAxe(container)).toHaveNoViolations();
+	});
+
+	it('warning variant passes axe audit', async () => {
+		const {container} = render(
+			<ol>
+				<ToastItem
+					item={makeItem({
+						variant: 'warning',
+						title: 'Warning message',
+					})}
+				/>
+			</ol>,
+		);
+		expect(await configuredAxe(container)).toHaveNoViolations();
+	});
+
+	it('info variant passes axe audit', async () => {
+		const {container} = render(
+			<ol>
+				<ToastItem
+					item={makeItem({variant: 'info', title: 'Info message'})}
+				/>
+			</ol>,
+		);
+		expect(await configuredAxe(container)).toHaveNoViolations();
+	});
+
+	it('success variant passes axe audit', async () => {
+		const {container} = render(
+			<ol>
+				<ToastItem
+					item={makeItem({
+						variant: 'success',
+						title: 'Success message',
+					})}
+				/>
+			</ol>,
+		);
+		expect(await configuredAxe(container)).toHaveNoViolations();
+	});
+});

@@ -1,0 +1,28 @@
+.toast-item {
+  /* info (default) */
+  --toast-bg: #eff6ff;
+  --toast-button-hover: #dbeafe;
+  --toast-icon-color: #3b82f6;
+  --toast-text-color: #1e3a5f;
+}
+
+.toast-item[data-variant='success'] {
+  --toast-bg: #f0fdf4;
+  --toast-button-hover: #dcfce7;
+  --toast-icon-color: #16a34a;
+  --toast-text-color: #14532d;
+}
+
+.toast-item[data-variant='error'] {
+  --toast-bg: #fef2f2;
+  --toast-button-hover: #fee2e2;
+  --toast-icon-color: #dc2626;
+  --toast-text-color: #7f1d1d;
+}
+
+.toast-item[data-variant='warning'] {
+  --toast-bg: #fffbeb;
+  --toast-button-hover: #fef3c7;
+  --toast-icon-color: #d97706;
+  --toast-text-color: #78350f;
+}
