@@ -124,7 +124,9 @@ describe('slotProps merging', () => {
 
 	it('close button has transition-all class (not conflicting transition-opacity + transition-colors)', () => {
 		render(<ToastItem item={makeItem()} />);
-		const closeBtn = screen.getByRole('button', {name: 'Close notification'});
+		const closeBtn = screen.getByRole('button', {
+			name: 'Close notification',
+		});
 		expect(closeBtn).toHaveClass('transition-all');
 		expect(closeBtn).not.toHaveClass('transition-opacity');
 		expect(closeBtn).not.toHaveClass('transition-colors');

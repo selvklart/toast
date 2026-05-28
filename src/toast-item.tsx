@@ -166,10 +166,22 @@ export function ToastItem({
 				animate={{opacity: 1, x: 0}}
 				exit={{opacity: 0, x: '100%'}}
 				transition={{type: 'spring', bounce: 0, duration: 0.35}}
-				onMouseEnter={(e) => { pauseTimer(); rootOnMouseEnter?.(e); }}
-				onMouseLeave={(e) => { startTimer(); rootOnMouseLeave?.(e); }}
-				onFocus={(e) => { pauseTimer(); rootOnFocus?.(e); }}
-				onBlur={(e) => { startTimer(); rootOnBlur?.(e); }}
+				onMouseEnter={(e) => {
+					pauseTimer();
+					rootOnMouseEnter?.(e);
+				}}
+				onMouseLeave={(e) => {
+					startTimer();
+					rootOnMouseLeave?.(e);
+				}}
+				onFocus={(e) => {
+					pauseTimer();
+					rootOnFocus?.(e);
+				}}
+				onBlur={(e) => {
+					startTimer();
+					rootOnBlur?.(e);
+				}}
 			>
 				{shouldShowIcon && (
 					<span
@@ -185,9 +197,7 @@ export function ToastItem({
 					</span>
 				)}
 
-				<div
-					className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}
-				>
+				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
 					<span
 						{...titleProps}
 						className={cn(

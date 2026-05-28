@@ -18,7 +18,8 @@ export function ToastRegion({
 	variantSlotProps,
 }: ToastRegionProps) {
 	const toasts = useToastQueue();
-	const visibleToasts = maxVisibleToasts > 0 ? toasts.slice(-maxVisibleToasts) : [];
+	const visibleToasts =
+		maxVisibleToasts > 0 ? toasts.slice(-maxVisibleToasts) : [];
 
 	return (
 		<div
