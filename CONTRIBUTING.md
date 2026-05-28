@@ -108,3 +108,34 @@ playground/
 4. Spread the slot props on the target element, merging `className` via `cn` and `style` via object spread (slot style last)
 5. Compose any internal event handlers with the consumer's handler
 6. Add a test in `src/toast-item.test.tsx` covering className merge and handler composition
+
+## Releasing
+
+This package uses [Changesets](https://github.com/changesets/changesets) for versioning and changelog generation.
+
+### For every PR that changes package behavior
+
+```bash
+npx changeset
+```
+
+Answer the prompts: select `@selvklart/toast`, choose a bump type, and write a short description. Commit the generated `.changeset/*.md` file alongside your code.
+
+| Bump | When |
+|------|------|
+| `patch` | Bug fixes, non-breaking tweaks |
+| `minor` | New features, new props, non-breaking additions |
+| `major` | Breaking API changes |
+
+### Publishing a new version
+
+1. The GitHub Actions bot maintains a **"Version Packages" PR** that batches all pending changesets, bumps `package.json`, and writes `CHANGELOG.md`. Review and merge it when ready to release.
+2. After merging, pull `main` and publish:
+
+```bash
+git pull
+npm run build
+npm publish
+```
+
+First-time only: run `npm login` to authenticate with the npm registry.
