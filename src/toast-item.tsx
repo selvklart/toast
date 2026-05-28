@@ -1,7 +1,6 @@
 'use client';
 
 import {useCallback, useEffect, useRef} from 'react';
-import clsx from 'clsx';
 import {motion} from 'motion/react';
 
 import {cn} from './cn';
@@ -90,7 +89,7 @@ export function ToastItem({
 	}, [id]);
 
 	const startTimer = useCallback(() => {
-		if (timeout === false || remainingRef.current <= 0) {
+		if (timeout === false || remainingRef.current < 0) {
 			return;
 		}
 		startTimeRef.current = Date.now();
@@ -127,6 +126,14 @@ export function ToastItem({
 		closeButton: closeButtonProps,
 	} = mergeSlotProps(slotProps, variantSlotProps);
 
+	const {
+		onMouseEnter: rootOnMouseEnter,
+		onMouseLeave: rootOnMouseLeave,
+		onFocus: rootOnFocus,
+		onBlur: rootOnBlur,
+		...restRootProps
+	} = rootProps ?? {};
+
 	return (
 		<li>
 			<motion.div
@@ -134,7 +141,7 @@ export function ToastItem({
 				role={variantRole[variant]}
 				aria-atomic="true"
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				{...(rootProps as any)}
+				{...(restRootProps as any)}
 				className={cn(
 					'toast-item',
 					'pointer-events-auto',
@@ -159,10 +166,22 @@ export function ToastItem({
 				animate={{opacity: 1, x: 0}}
 				exit={{opacity: 0, x: '100%'}}
 				transition={{type: 'spring', bounce: 0, duration: 0.35}}
-				onMouseEnter={pauseTimer}
-				onMouseLeave={startTimer}
-				onFocus={pauseTimer}
-				onBlur={startTimer}
+				onMouseEnter={(e) => {
+					pauseTimer();
+					rootOnMouseEnter?.(e);
+				}}
+				onMouseLeave={(e) => {
+					startTimer();
+					rootOnMouseLeave?.(e);
+				}}
+				onFocus={(e) => {
+					pauseTimer();
+					rootOnFocus?.(e);
+				}}
+				onBlur={(e) => {
+					startTimer();
+					rootOnBlur?.(e);
+				}}
 			>
 				{shouldShowIcon && (
 					<span
@@ -178,9 +197,7 @@ export function ToastItem({
 					</span>
 				)}
 
-				<div
-					className={clsx('flex-1', 'min-w-0', 'relative', 'top-0.5')}
-				>
+				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
 					<span
 						{...titleProps}
 						className={cn(
@@ -214,9 +231,12 @@ export function ToastItem({
 						type="button"
 						{...actionButtonProps}
 						onClick={(e) => {
-							action.onClick();
-							dismiss();
-							actionButtonProps?.onClick?.(e);
+							try {
+								action.onClick();
+								actionButtonProps?.onClick?.(e);
+							} finally {
+								dismiss();
+							}
 						}}
 						className={cn(
 							'shrink-0',
@@ -249,7 +269,7 @@ export function ToastItem({
 						'rounded-sm',
 						'p-1',
 						'opacity-70',
-						'transition-opacity',
+						'transition-all',
 						'hover:opacity-100',
 						'focus-visible:outline',
 						'focus-visible:outline-2',
@@ -257,7 +277,6 @@ export function ToastItem({
 						'focus-visible:bg-[var(--toast-button-hover)]',
 						'hover:bg-[var(--toast-button-hover)]',
 						'cursor-pointer',
-						'transition-colors',
 						closeButtonProps?.className,
 					)}
 				>

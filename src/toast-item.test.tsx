@@ -44,6 +44,15 @@ describe('timer logic', () => {
 		expect(toast.dismiss).not.toHaveBeenCalled();
 	});
 
+	it('timeout: 0 dismisses immediately (next tick)', () => {
+		render(<ToastItem item={makeItem({timeout: 0})} />);
+		expect(toast.dismiss).not.toHaveBeenCalled();
+		act(() => {
+			vi.advanceTimersByTime(0);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
 	it('onMouseEnter pauses and onMouseLeave resumes timer', () => {
 		render(<ToastItem item={makeItem({timeout: 5000})} />);
 		const rootDiv = screen.getByRole('status');
@@ -110,6 +119,111 @@ describe('slotProps merging', () => {
 			screen.getByRole('button', {name: 'Close notification'}),
 		);
 		expect(extraOnClick).toHaveBeenCalledTimes(1);
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('close button has transition-all class (not conflicting transition-opacity + transition-colors)', () => {
+		render(<ToastItem item={makeItem()} />);
+		const closeBtn = screen.getByRole('button', {
+			name: 'Close notification',
+		});
+		expect(closeBtn).toHaveClass('transition-all');
+		expect(closeBtn).not.toHaveClass('transition-opacity');
+		expect(closeBtn).not.toHaveClass('transition-colors');
+	});
+
+	it('slotProps.root.onMouseEnter fires alongside internal pauseTimer', () => {
+		const rootMouseEnter = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onMouseEnter: rootMouseEnter}}}
+			/>,
+		);
+		fireEvent.mouseEnter(screen.getByRole('status'));
+		expect(rootMouseEnter).toHaveBeenCalledTimes(1);
+		// timer is still paused (internal handler still ran)
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+	});
+
+	it('slotProps.root.onFocus fires alongside internal pauseTimer', () => {
+		const rootFocus = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onFocus: rootFocus}}}
+			/>,
+		);
+		fireEvent.focus(screen.getByRole('status'));
+		expect(rootFocus).toHaveBeenCalledTimes(1);
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+	});
+
+	it('slotProps.root.onMouseLeave fires alongside internal startTimer', () => {
+		const rootMouseLeave = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onMouseLeave: rootMouseLeave}}}
+			/>,
+		);
+		const rootDiv = screen.getByRole('status');
+		fireEvent.mouseEnter(rootDiv);
+		fireEvent.mouseLeave(rootDiv);
+		expect(rootMouseLeave).toHaveBeenCalledTimes(1);
+		// timer restarts — dismiss fires after remaining time
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('slotProps.root.onBlur fires alongside internal startTimer', () => {
+		const rootBlur = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onBlur: rootBlur}}}
+			/>,
+		);
+		const rootDiv = screen.getByRole('status');
+		fireEvent.focus(rootDiv);
+		fireEvent.blur(rootDiv);
+		expect(rootBlur).toHaveBeenCalledTimes(1);
+		// timer restarts — dismiss fires after remaining time
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('dismiss is called even when action.onClick throws', () => {
+		const throwing = vi.fn().mockImplementation(() => {
+			throw new Error('oops');
+		});
+		render(
+			<ToastItem
+				item={makeItem({
+					action: {label: 'Retry', onClick: throwing},
+				})}
+			/>,
+		);
+		// React 19 re-dispatches errors from event handlers to window as an error event.
+		// Suppress it with preventDefault() so Vitest doesn't treat it as unhandled.
+		const handleError = (e: ErrorEvent) => e.preventDefault();
+		window.addEventListener('error', handleError);
+		try {
+			fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
+		} catch {
+			// swallow synchronous re-throw from React event dispatching
+		}
+		window.removeEventListener('error', handleError);
 		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
 	});
 });
