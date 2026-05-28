@@ -210,7 +210,7 @@ export function ToastItem({
 					</span>
 				)}
 
-				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
+				<div className={cn('flex-1', 'min-w-0', 'relative')}>
 					<span
 						{...titleProps}
 						className={cn(
