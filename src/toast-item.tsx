@@ -1,7 +1,6 @@
 'use client';
 
 import {useCallback, useEffect, useRef} from 'react';
-import clsx from 'clsx';
 import {motion} from 'motion/react';
 
 import {cn} from './cn';
@@ -179,7 +178,7 @@ export function ToastItem({
 				)}
 
 				<div
-					className={clsx('flex-1', 'min-w-0', 'relative', 'top-0.5')}
+					className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}
 				>
 					<span
 						{...titleProps}
