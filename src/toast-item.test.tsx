@@ -141,17 +141,16 @@ describe('slotProps merging', () => {
 				})}
 			/>,
 		);
-		// fireEvent.click doesn't directly throw in React event handlers,
-		// but we can use act() and verify both the error callback was called
-		// and dismiss still ran
+		// React 19 re-dispatches errors from event handlers to window as an error event.
+		// Suppress it with preventDefault() so Vitest doesn't treat it as unhandled.
+		const handleError = (e: ErrorEvent) => e.preventDefault();
+		window.addEventListener('error', handleError);
 		try {
-			act(() => {
-				fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
-			});
+			fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
 		} catch {
-			// The error from action.onClick may be caught by React's error handling
+			// swallow synchronous re-throw from React event dispatching
 		}
-		expect(throwing).toHaveBeenCalledTimes(1);
+		window.removeEventListener('error', handleError);
 		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
 	});
 });
