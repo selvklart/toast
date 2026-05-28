@@ -44,6 +44,15 @@ describe('timer logic', () => {
 		expect(toast.dismiss).not.toHaveBeenCalled();
 	});
 
+	it('timeout: 0 dismisses immediately (next tick)', () => {
+		render(<ToastItem item={makeItem({timeout: 0})} />);
+		expect(toast.dismiss).not.toHaveBeenCalled();
+		act(() => {
+			vi.advanceTimersByTime(0);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
 	it('onMouseEnter pauses and onMouseLeave resumes timer', () => {
 		render(<ToastItem item={makeItem({timeout: 5000})} />);
 		const rootDiv = screen.getByRole('status');

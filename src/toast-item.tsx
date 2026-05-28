@@ -89,7 +89,7 @@ export function ToastItem({
 	}, [id]);
 
 	const startTimer = useCallback(() => {
-		if (timeout === false || remainingRef.current <= 0) {
+		if (timeout === false || remainingRef.current < 0) {
 			return;
 		}
 		startTimeRef.current = Date.now();
