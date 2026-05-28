@@ -163,6 +163,44 @@ describe('slotProps merging', () => {
 		expect(toast.dismiss).not.toHaveBeenCalled();
 	});
 
+	it('slotProps.root.onMouseLeave fires alongside internal startTimer', () => {
+		const rootMouseLeave = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onMouseLeave: rootMouseLeave}}}
+			/>,
+		);
+		const rootDiv = screen.getByRole('status');
+		fireEvent.mouseEnter(rootDiv);
+		fireEvent.mouseLeave(rootDiv);
+		expect(rootMouseLeave).toHaveBeenCalledTimes(1);
+		// timer restarts — dismiss fires after remaining time
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
+	it('slotProps.root.onBlur fires alongside internal startTimer', () => {
+		const rootBlur = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onBlur: rootBlur}}}
+			/>,
+		);
+		const rootDiv = screen.getByRole('status');
+		fireEvent.focus(rootDiv);
+		fireEvent.blur(rootDiv);
+		expect(rootBlur).toHaveBeenCalledTimes(1);
+		// timer restarts — dismiss fires after remaining time
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
+
 	it('dismiss is called even when action.onClick throws', () => {
 		const throwing = vi.fn().mockImplementation(() => {
 			throw new Error('oops');

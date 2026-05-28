@@ -223,9 +223,9 @@ export function ToastItem({
 						onClick={(e) => {
 							try {
 								action.onClick();
+								actionButtonProps?.onClick?.(e);
 							} finally {
 								dismiss();
-								actionButtonProps?.onClick?.(e);
 							}
 						}}
 						className={cn(
