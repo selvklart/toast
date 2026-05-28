@@ -6,6 +6,7 @@ import {motion} from 'motion/react';
 import {cn} from './cn';
 import {toast} from './toast-queue';
 import type {
+	Placement,
 	ToastItem as ToastItemType,
 	ToastSlotProps,
 	ToastVariant,
@@ -16,7 +17,18 @@ type Props = {
 	resolvedIcon?: React.ReactNode;
 	slotProps?: ToastSlotProps;
 	variantSlotProps?: ToastSlotProps;
+	placement?: Placement;
 };
+
+function getHiddenTransform(placement: Placement) {
+	if (placement.endsWith('right')) {
+		return {x: '100%', y: 0};
+	}
+	if (placement.endsWith('left')) {
+		return {x: '-100%', y: 0};
+	}
+	return placement.startsWith('top') ? {x: 0, y: '-100%'} : {x: 0, y: '100%'};
+}
 
 function mergeSlot<T extends {className?: string; style?: React.CSSProperties}>(
 	base?: T,
@@ -74,6 +86,7 @@ export function ToastItem({
 	resolvedIcon,
 	slotProps,
 	variantSlotProps,
+	placement = 'bottom-right',
 }: Props) {
 	const {id, title, variant, timeout, icon, action, description, showIcon} =
 		item;
@@ -162,9 +175,9 @@ export function ToastItem({
 					color: 'var(--toast-text-color)',
 					...rootProps?.style,
 				}}
-				initial={{opacity: 0, x: '100%'}}
-				animate={{opacity: 1, x: 0}}
-				exit={{opacity: 0, x: '100%'}}
+				initial={{opacity: 0, ...getHiddenTransform(placement)}}
+				animate={{opacity: 1, x: 0, y: 0}}
+				exit={{opacity: 0, ...getHiddenTransform(placement)}}
 				transition={{type: 'spring', bounce: 0, duration: 0.35}}
 				onMouseEnter={(e) => {
 					pauseTimer();
@@ -197,7 +210,7 @@ export function ToastItem({
 					</span>
 				)}
 
-				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
+				<div className={cn('flex-1', 'min-w-0', 'relative')}>
 					<span
 						{...titleProps}
 						className={cn(

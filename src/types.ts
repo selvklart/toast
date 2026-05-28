@@ -2,6 +2,14 @@ import type {ComponentPropsWithoutRef, HTMLAttributes, ReactNode} from 'react';
 
 export type ToastVariant = 'success' | 'error' | 'info' | 'warning';
 
+export type Placement =
+	| 'top-left'
+	| 'top-center'
+	| 'top-right'
+	| 'bottom-left'
+	| 'bottom-center'
+	| 'bottom-right';
+
 export type ToastAction = {
 	label: string;
 	onClick: () => void;
@@ -58,4 +66,6 @@ export type ToastRegionProps = {
 	slotProps?: ToastSlotProps;
 	/** Per-variant slotProps. Merged on top of slotProps, so variant overrides global defaults. */
 	variantSlotProps?: Partial<Record<ToastVariant, ToastSlotProps>>;
+	/** Position of the toast stack on screen. @default 'bottom-right' */
+	placement?: Placement;
 };
