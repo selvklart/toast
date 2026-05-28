@@ -61,6 +61,20 @@ describe('icons config', () => {
 		expect(screen.getByText('Two')).toBeInTheDocument();
 		expect(screen.getByText('Three')).toBeInTheDocument();
 	});
+
+	it('maxVisibleToasts={0} shows no toasts', () => {
+		toast.success('One');
+		toast.success('Two');
+		render(<ToastRegion maxVisibleToasts={0} />);
+		expect(screen.queryByText('One')).not.toBeInTheDocument();
+		expect(screen.queryByText('Two')).not.toBeInTheDocument();
+	});
+
+	it('negative maxVisibleToasts shows no toasts', () => {
+		toast.success('One');
+		render(<ToastRegion maxVisibleToasts={-1} />);
+		expect(screen.queryByText('One')).not.toBeInTheDocument();
+	});
 });
 
 describe('accessibility', () => {
