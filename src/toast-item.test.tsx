@@ -130,6 +130,39 @@ describe('slotProps merging', () => {
 		expect(closeBtn).not.toHaveClass('transition-colors');
 	});
 
+	it('slotProps.root.onMouseEnter fires alongside internal pauseTimer', () => {
+		const rootMouseEnter = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onMouseEnter: rootMouseEnter}}}
+			/>,
+		);
+		fireEvent.mouseEnter(screen.getByRole('status'));
+		expect(rootMouseEnter).toHaveBeenCalledTimes(1);
+		// timer is still paused (internal handler still ran)
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+	});
+
+	it('slotProps.root.onFocus fires alongside internal pauseTimer', () => {
+		const rootFocus = vi.fn();
+		render(
+			<ToastItem
+				item={makeItem({timeout: 5000})}
+				slotProps={{root: {onFocus: rootFocus}}}
+			/>,
+		);
+		fireEvent.focus(screen.getByRole('status'));
+		expect(rootFocus).toHaveBeenCalledTimes(1);
+		act(() => {
+			vi.advanceTimersByTime(5000);
+		});
+		expect(toast.dismiss).not.toHaveBeenCalled();
+	});
+
 	it('dismiss is called even when action.onClick throws', () => {
 		const throwing = vi.fn().mockImplementation(() => {
 			throw new Error('oops');

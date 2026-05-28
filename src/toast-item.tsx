@@ -126,6 +126,14 @@ export function ToastItem({
 		closeButton: closeButtonProps,
 	} = mergeSlotProps(slotProps, variantSlotProps);
 
+	const {
+		onMouseEnter: rootOnMouseEnter,
+		onMouseLeave: rootOnMouseLeave,
+		onFocus: rootOnFocus,
+		onBlur: rootOnBlur,
+		...restRootProps
+	} = rootProps ?? {};
+
 	return (
 		<li>
 			<motion.div
@@ -133,7 +141,7 @@ export function ToastItem({
 				role={variantRole[variant]}
 				aria-atomic="true"
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				{...(rootProps as any)}
+				{...(restRootProps as any)}
 				className={cn(
 					'toast-item',
 					'pointer-events-auto',
@@ -158,10 +166,10 @@ export function ToastItem({
 				animate={{opacity: 1, x: 0}}
 				exit={{opacity: 0, x: '100%'}}
 				transition={{type: 'spring', bounce: 0, duration: 0.35}}
-				onMouseEnter={pauseTimer}
-				onMouseLeave={startTimer}
-				onFocus={pauseTimer}
-				onBlur={startTimer}
+				onMouseEnter={(e) => { pauseTimer(); rootOnMouseEnter?.(e); }}
+				onMouseLeave={(e) => { startTimer(); rootOnMouseLeave?.(e); }}
+				onFocus={(e) => { pauseTimer(); rootOnFocus?.(e); }}
+				onBlur={(e) => { startTimer(); rootOnBlur?.(e); }}
 			>
 				{shouldShowIcon && (
 					<span
