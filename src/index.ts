@@ -1,6 +1,7 @@
 export {toast} from './toast-queue';
 export {ToastRegion} from './toast-region';
 export type {
+	Placement,
 	ToastAction,
 	ToastIcons,
 	ToastInput,

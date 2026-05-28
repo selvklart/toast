@@ -155,6 +155,7 @@ toast.success('No icon here', {showIcon: false});
 |---|---|---|---|
 | `icons` | `ToastIcons` | — | Icon per variant. No icon shown unless provided. |
 | `maxVisibleToasts` | `number` | `10` | Cap on simultaneously visible toasts. Oldest are hidden first. |
+| `placement` | `Placement` | `'bottom-right'` | Where the toast stack appears on screen. |
 | `ariaLabel` | `string` | `"Notifications"` | Accessible label for the `role="region"` wrapper. |
 | `className` | `string` | — | Applied to the root `div`. Useful for setting CSS custom properties that cascade into toasts. |
 | `slotProps` | `ToastSlotProps` | — | Forwarded to every `ToastItem` in the region. Per-variant and per-toast slot props are merged on top. |
@@ -259,6 +260,7 @@ All types are exported:
 
 ```ts
 import type {
+  Placement,
   ToastVariant,
   ToastOptions,
   ToastInput,
@@ -273,6 +275,27 @@ import type {
 ---
 
 ## Theming
+
+### Changing toast position
+
+Use the `placement` prop on `ToastRegion`:
+
+```tsx
+<ToastRegion placement="top-center" />
+```
+
+Available values: `'top-left'`, `'top-center'`, `'top-right'`, `'bottom-left'`, `'bottom-center'`, `'bottom-right'`. Default is `'bottom-right'`.
+
+For fine-grained control (custom inset, etc.) you can still override the CSS directly:
+
+```css
+.toast-region {
+  bottom: 2rem;
+  right: 2rem;
+}
+```
+
+### Colors
 
 Colors are CSS custom properties set on `.toast-item` via `data-variant`.
 

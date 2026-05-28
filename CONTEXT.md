@@ -15,7 +15,10 @@ A single entry in the queue. Combines `ToastInput` (title, variant, and all opti
 The React component that renders one toast. Receives a `ToastItem` type object as `item`, an optional `resolvedIcon` (pre-resolved by `ToastRegion` from the icons config), and optional `slotProps` for per-slot customisation. Manages its own dismiss timer.
 
 **ToastRegion**
-The mounting component. Subscribes to the queue via `useToastQueue`, slices to `maxVisibleToasts`, and renders each `ToastItem` inside an `AnimatePresence`. Accepts `icons`, `ariaLabel`, `className` (applied to the root wrapper, useful for cascading CSS variable overrides), `slotProps` (forwarded to every `ToastItem`), and `variantSlotProps` (per-variant slot props merged on top of `slotProps`). Placed once at the app root.
+The mounting component. Subscribes to the queue via `useToastQueue`, slices to `maxVisibleToasts`, and renders each `ToastItem` inside an `AnimatePresence`. Accepts `icons`, `ariaLabel`, `className` (applied to the root wrapper, useful for cascading CSS variable overrides), `slotProps` (forwarded to every `ToastItem`), `variantSlotProps` (per-variant slot props merged on top of `slotProps`), and `placement` (screen position). Placed once at the app root.
+
+**placement**
+One of `'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'`. Set on `ToastRegion`. Controls where the toast stack is anchored on screen and which direction each `ToastItem` slides in/out from. Not overridable per toast. Default: `'bottom-right'`.
 
 **variant**
 One of `'success' | 'error' | 'info' | 'warning'`. Determines which CSS custom properties are applied via `data-variant` attribute and `src/styles.css`.

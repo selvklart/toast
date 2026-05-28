@@ -2,7 +2,6 @@
 
 import {AnimatePresence} from 'motion/react';
 
-import {cn} from './cn';
 import {ToastItem} from './toast-item';
 import type {ToastRegionProps} from './types';
 import {useToastQueue} from './use-toast-queue';
@@ -16,6 +15,7 @@ export function ToastRegion({
 	className,
 	slotProps,
 	variantSlotProps,
+	placement = 'bottom-right',
 }: ToastRegionProps) {
 	const toasts = useToastQueue();
 	const visibleToasts =
@@ -28,18 +28,7 @@ export function ToastRegion({
 			tabIndex={-1}
 			className={className}
 		>
-			<ol
-				className={cn(
-					'fixed',
-					'bottom-4',
-					'right-4',
-					'z-[9999]',
-					'flex',
-					'flex-col',
-					'gap-2',
-					'pointer-events-none',
-				)}
-			>
+			<ol className="toast-region" data-placement={placement}>
 				<AnimatePresence mode="popLayout" initial={false}>
 					{visibleToasts.map((item) => (
 						<ToastItem
@@ -48,6 +37,7 @@ export function ToastRegion({
 							resolvedIcon={icons?.[item.variant]}
 							slotProps={slotProps}
 							variantSlotProps={variantSlotProps?.[item.variant]}
+							placement={placement}
 						/>
 					))}
 				</AnimatePresence>

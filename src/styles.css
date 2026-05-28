@@ -26,3 +26,49 @@
   --toast-icon-color: #d97706;
   --toast-text-color: #78350f;
 }
+
+.toast-region {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast-region[data-placement='bottom-right'] {
+  bottom: 1rem;
+  right: 1rem;
+  flex-direction: column;
+}
+
+.toast-region[data-placement='bottom-left'] {
+  bottom: 1rem;
+  left: 1rem;
+  flex-direction: column;
+}
+
+.toast-region[data-placement='bottom-center'] {
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+}
+
+.toast-region[data-placement='top-right'] {
+  top: 1rem;
+  right: 1rem;
+  flex-direction: column-reverse;
+}
+
+.toast-region[data-placement='top-left'] {
+  top: 1rem;
+  left: 1rem;
+  flex-direction: column-reverse;
+}
+
+.toast-region[data-placement='top-center'] {
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column-reverse;
+}
