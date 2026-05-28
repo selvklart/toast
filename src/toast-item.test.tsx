@@ -129,6 +129,31 @@ describe('slotProps merging', () => {
 		expect(closeBtn).not.toHaveClass('transition-opacity');
 		expect(closeBtn).not.toHaveClass('transition-colors');
 	});
+
+	it('dismiss is called even when action.onClick throws', () => {
+		const throwing = vi.fn().mockImplementation(() => {
+			throw new Error('oops');
+		});
+		render(
+			<ToastItem
+				item={makeItem({
+					action: {label: 'Retry', onClick: throwing},
+				})}
+			/>,
+		);
+		// fireEvent.click doesn't directly throw in React event handlers,
+		// but we can use act() and verify both the error callback was called
+		// and dismiss still ran
+		try {
+			act(() => {
+				fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
+			});
+		} catch {
+			// The error from action.onClick may be caught by React's error handling
+		}
+		expect(throwing).toHaveBeenCalledTimes(1);
+		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
+	});
 });
 
 describe('variantSlotProps merging', () => {

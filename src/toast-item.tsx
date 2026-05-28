@@ -213,9 +213,12 @@ export function ToastItem({
 						type="button"
 						{...actionButtonProps}
 						onClick={(e) => {
-							action.onClick();
-							dismiss();
-							actionButtonProps?.onClick?.(e);
+							try {
+								action.onClick();
+							} finally {
+								dismiss();
+								actionButtonProps?.onClick?.(e);
+							}
 						}}
 						className={cn(
 							'shrink-0',
