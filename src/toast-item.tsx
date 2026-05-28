@@ -248,7 +248,7 @@ export function ToastItem({
 						'rounded-sm',
 						'p-1',
 						'opacity-70',
-						'transition-opacity',
+						'transition-all',
 						'hover:opacity-100',
 						'focus-visible:outline',
 						'focus-visible:outline-2',
@@ -256,7 +256,6 @@ export function ToastItem({
 						'focus-visible:bg-[var(--toast-button-hover)]',
 						'hover:bg-[var(--toast-button-hover)]',
 						'cursor-pointer',
-						'transition-colors',
 						closeButtonProps?.className,
 					)}
 				>

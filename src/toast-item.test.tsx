@@ -112,6 +112,14 @@ describe('slotProps merging', () => {
 		expect(extraOnClick).toHaveBeenCalledTimes(1);
 		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
 	});
+
+	it('close button has transition-all class (not conflicting transition-opacity + transition-colors)', () => {
+		render(<ToastItem item={makeItem()} />);
+		const closeBtn = screen.getByRole('button', {name: 'Close notification'});
+		expect(closeBtn).toHaveClass('transition-all');
+		expect(closeBtn).not.toHaveClass('transition-opacity');
+		expect(closeBtn).not.toHaveClass('transition-colors');
+	});
 });
 
 describe('variantSlotProps merging', () => {
