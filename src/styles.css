@@ -27,6 +27,21 @@
   --toast-text-color: #78350f;
 }
 
+@layer toast {
+  .toast-item {
+    background-color: var(--toast-bg);
+    color: var(--toast-text-color);
+  }
+
+  .toast-icon {
+    color: var(--toast-icon-color);
+  }
+
+  .toast-action-button {
+    color: var(--toast-icon-color);
+  }
+}
+
 .toast-region {
   position: fixed;
   z-index: 9999;

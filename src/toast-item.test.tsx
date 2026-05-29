@@ -276,6 +276,100 @@ describe('variantSlotProps merging', () => {
 	});
 });
 
+describe('CSS class overridability', () => {
+	it('root element has no inline backgroundColor by default', () => {
+		render(<ToastItem item={makeItem()} />);
+		expect(screen.getByRole('status')).not.toHaveStyle({
+			backgroundColor: 'var(--toast-bg)',
+		});
+	});
+
+	it('root element has no inline color by default', () => {
+		render(<ToastItem item={makeItem()} />);
+		expect(screen.getByRole('status')).not.toHaveStyle({
+			color: 'var(--toast-text-color)',
+		});
+	});
+
+	it('icon span has toast-icon class', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				resolvedIcon={<svg data-testid="icon" />}
+			/>,
+		);
+		const iconSpan = document.querySelector('span[aria-hidden="true"]');
+		expect(iconSpan).toHaveClass('toast-icon');
+	});
+
+	it('icon span has no inline color by default', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				resolvedIcon={<svg data-testid="icon" />}
+			/>,
+		);
+		const iconSpan = document.querySelector('span[aria-hidden="true"]');
+		expect(iconSpan).not.toHaveStyle({color: 'var(--toast-icon-color)'});
+	});
+
+	it('action button has toast-action-button class', () => {
+		render(
+			<ToastItem
+				item={makeItem({action: {label: 'Retry', onClick: vi.fn()}})}
+			/>,
+		);
+		expect(screen.getByRole('button', {name: 'Retry'})).toHaveClass(
+			'toast-action-button',
+		);
+	});
+
+	it('action button has no inline color by default', () => {
+		render(
+			<ToastItem
+				item={makeItem({action: {label: 'Retry', onClick: vi.fn()}})}
+			/>,
+		);
+		expect(screen.getByRole('button', {name: 'Retry'})).not.toHaveStyle({
+			color: 'var(--toast-icon-color)',
+		});
+	});
+
+	it('consumer style on root is applied as inline style', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				slotProps={{root: {style: {outlineWidth: '3px'}}}}
+			/>,
+		);
+		expect(screen.getByRole('status')).toHaveStyle({outlineWidth: '3px'});
+	});
+
+	it('consumer style on icon is applied as inline style', () => {
+		render(
+			<ToastItem
+				item={makeItem()}
+				resolvedIcon={<svg data-testid="icon" />}
+				slotProps={{icon: {style: {outlineWidth: '3px'}}}}
+			/>,
+		);
+		const iconSpan = document.querySelector('span[aria-hidden="true"]');
+		expect(iconSpan).toHaveStyle({outlineWidth: '3px'});
+	});
+
+	it('consumer style on actionButton is applied as inline style', () => {
+		render(
+			<ToastItem
+				item={makeItem({action: {label: 'Retry', onClick: vi.fn()}})}
+				slotProps={{actionButton: {style: {outlineWidth: '3px'}}}}
+			/>,
+		);
+		expect(screen.getByRole('button', {name: 'Retry'})).toHaveStyle({
+			outlineWidth: '3px',
+		});
+	});
+});
+
 const configuredAxe = configureAxe({
 	rules: {'color-contrast': {enabled: false}},
 });
