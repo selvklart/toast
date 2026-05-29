@@ -135,7 +135,13 @@ Answer the prompts: select `@selvklart/toast`, choose a bump type, and write a s
 ```bash
 git pull
 npm run build
-npm publish
+npx changeset publish
+```
+
+`changeset publish` publishes to npm **and** creates the git tag (e.g. `@selvklart/toast@1.1.2`). Push the tag afterwards:
+
+```bash
+git push --follow-tags
 ```
 
 First-time only: run `npm login` to authenticate with the npm registry.
