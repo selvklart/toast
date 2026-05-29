@@ -318,6 +318,19 @@ Colors are CSS custom properties set on `.toast-item` via `data-variant`.
 
 ### Via `variantSlotProps` (prop-based, per-variant)
 
+Use `className` to apply Tailwind utilities or your own CSS classes:
+
+```tsx
+<ToastRegion
+  variantSlotProps={{
+    error: {root: {className: 'bg-red-100 border border-red-400'}},
+    success: {icon: {className: 'text-emerald-600'}},
+  }}
+/>
+```
+
+Or use `style` to override the CSS custom properties directly:
+
 ```tsx
 <ToastRegion
   variantSlotProps={{

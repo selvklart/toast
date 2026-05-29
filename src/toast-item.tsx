@@ -170,11 +170,7 @@ export function ToastItem({
 					rootProps?.className,
 				)}
 				data-variant={variant}
-				style={{
-					backgroundColor: 'var(--toast-bg)',
-					color: 'var(--toast-text-color)',
-					...rootProps?.style,
-				}}
+				style={rootProps?.style}
 				initial={{opacity: 0, ...getHiddenTransform(placement)}}
 				animate={{opacity: 1, x: 0, y: 0}}
 				exit={{opacity: 0, ...getHiddenTransform(placement)}}
@@ -199,18 +195,19 @@ export function ToastItem({
 				{shouldShowIcon && (
 					<span
 						{...iconProps}
-						className={cn('shrink-0', iconProps?.className)}
-						style={{
-							color: 'var(--toast-icon-color)',
-							...iconProps?.style,
-						}}
+						className={cn(
+							'shrink-0',
+							'toast-icon',
+							iconProps?.className,
+						)}
+						style={iconProps?.style}
 						aria-hidden
 					>
 						{activeIcon}
 					</span>
 				)}
 
-				<div className={cn('flex-1', 'min-w-0', 'relative')}>
+				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
 					<span
 						{...titleProps}
 						className={cn(
@@ -258,12 +255,10 @@ export function ToastItem({
 							'underline',
 							'underline-offset-2',
 							'cursor-pointer',
+							'toast-action-button',
 							actionButtonProps?.className,
 						)}
-						style={{
-							color: 'var(--toast-icon-color)',
-							...actionButtonProps?.style,
-						}}
+						style={actionButtonProps?.style}
 					>
 						{action.label}
 					</button>
