@@ -122,14 +122,12 @@ describe('slotProps merging', () => {
 		expect(toast.dismiss).toHaveBeenCalledWith('test-id');
 	});
 
-	it('close button has transition-all class (not conflicting transition-opacity + transition-colors)', () => {
+	it('close button has toast-close-button class', () => {
 		render(<ToastItem item={makeItem()} />);
 		const closeBtn = screen.getByRole('button', {
 			name: 'Close notification',
 		});
-		expect(closeBtn).toHaveClass('transition-all');
-		expect(closeBtn).not.toHaveClass('transition-opacity');
-		expect(closeBtn).not.toHaveClass('transition-colors');
+		expect(closeBtn).toHaveClass('toast-close-button');
 	});
 
 	it('slotProps.root.onMouseEnter fires alongside internal pauseTimer', () => {

@@ -155,20 +155,7 @@ export function ToastItem({
 				aria-atomic="true"
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				{...(restRootProps as any)}
-				className={cn(
-					'toast-item',
-					'pointer-events-auto',
-					'flex',
-					'items-start',
-					'gap-2',
-					'md:gap-3',
-					'rounded-md',
-					'px-4',
-					'py-4',
-					'shadow-md',
-					'w-[min(24rem,calc(100vw-2.8rem))]',
-					rootProps?.className,
-				)}
+				className={cn('toast-item', rootProps?.className)}
 				data-variant={variant}
 				style={rootProps?.style}
 				initial={{opacity: 0, ...getHiddenTransform(placement)}}
@@ -195,11 +182,7 @@ export function ToastItem({
 				{shouldShowIcon && (
 					<span
 						{...iconProps}
-						className={cn(
-							'shrink-0',
-							'toast-icon',
-							iconProps?.className,
-						)}
+						className={cn('toast-icon', iconProps?.className)}
 						style={iconProps?.style}
 						aria-hidden
 					>
@@ -207,16 +190,10 @@ export function ToastItem({
 					</span>
 				)}
 
-				<div className={cn('flex-1', 'min-w-0', 'relative', 'top-0.5')}>
+				<div className="toast-content">
 					<span
 						{...titleProps}
-						className={cn(
-							'text-sm',
-							'md:text-base',
-							'font-semibold',
-							'block',
-							titleProps?.className,
-						)}
+						className={cn('toast-title', titleProps?.className)}
 					>
 						{title}
 					</span>
@@ -224,10 +201,7 @@ export function ToastItem({
 						<p
 							{...descriptionProps}
 							className={cn(
-								'text-sm',
-								'md:text-base',
-								'mt-1',
-								'opacity-90',
+								'toast-description',
 								descriptionProps?.className,
 							)}
 						>
@@ -249,12 +223,6 @@ export function ToastItem({
 							}
 						}}
 						className={cn(
-							'shrink-0',
-							'text-base',
-							'font-semibold',
-							'underline',
-							'underline-offset-2',
-							'cursor-pointer',
 							'toast-action-button',
 							actionButtonProps?.className,
 						)}
@@ -273,18 +241,7 @@ export function ToastItem({
 						closeButtonProps?.onClick?.(e);
 					}}
 					className={cn(
-						'shrink-0',
-						'rounded-sm',
-						'p-1',
-						'opacity-70',
-						'transition-all',
-						'hover:opacity-100',
-						'focus-visible:outline',
-						'focus-visible:outline-2',
-						'focus-visible:outline-offset-2',
-						'focus-visible:bg-[var(--toast-button-hover)]',
-						'hover:bg-[var(--toast-button-hover)]',
-						'cursor-pointer',
+						'toast-close-button',
 						closeButtonProps?.className,
 					)}
 				>

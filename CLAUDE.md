@@ -3,7 +3,7 @@
 ## Commands
 
 ```bash
-npm run build        # tsup + Tailwind CLI compiles src/tw.css → dist/styles.css
+npm run build        # tsup bundles JS; copies src/styles.css → dist/styles.css
 npm run dev          # tsup in watch mode
 npm run playground   # Vite dev server at playground/
 npm test             # vitest run (single pass)
@@ -16,8 +16,8 @@ npm run typecheck    # tsc --noEmit
 - **No icon library dependency.** Icons are provided by the consumer via `<ToastRegion icons={{...}} />`. The close button uses an inline SVG. Do not add `@navikt/aksel-icons`, `lucide-react`, or any other icon package.
 - **No Digdir/NAV design system tokens.** Colors are hardcoded CSS custom properties in `src/styles.css`. Do not reference `--ds-color-*` tokens.
 - **`motion` is a peer dependency.** Import from `motion/react`. Do not bundle it — it must stay in `external` in `tsup.config.ts`.
-- **`clsx` and `tailwind-merge` are direct dependencies.** Use the `cn` utility from `src/cn.ts` for all className merging.
-- **Tailwind for layout only.** Variant colors live in `src/styles.css` as CSS custom properties (`--toast-bg`, `--toast-icon-color`, etc.), not Tailwind classes.
+- **`clsx` is a direct dependency.** Use the `cn` utility from `src/cn.ts` for all className merging. `cn` wraps `clsx` only (no `tailwind-merge`).
+- **No Tailwind in the package.** All styling is hand-written, namespaced CSS in `src/styles.css` (classes are prefixed `toast-*`). The package ships **no generic utility classes** — this is deliberate so it can never collide with a consumer app's own utilities (e.g. `hidden`, `lg:block`). Do not reintroduce Tailwind utility classes into `src/*.tsx`; add a namespaced `.toast-*` rule to `src/styles.css` instead. Variant colors live in `src/styles.css` as CSS custom properties (`--toast-bg`, `--toast-icon-color`, etc.). (The `playground/` still uses Tailwind for its own demo page — that is not part of the published package.)
 
 ## slotProps pattern
 
@@ -38,7 +38,7 @@ The package exports `styles.css` via `"./styles.css"` in `package.json` exports.
 import '@selvklart/toast/styles.css';
 ```
 
-The build script runs `tailwindcss -i src/tw.css -o dist/styles.css`. `src/tw.css` imports `tailwindcss/utilities`, sources `src/` for class names, and imports `src/styles.css` for the custom properties. The compiled `dist/styles.css` contains pre-built Tailwind utility classes + variant custom properties — consumers need no Tailwind configuration of their own.
+The build script copies `src/styles.css` verbatim to `dist/styles.css` (`tsup && cp src/styles.css dist/styles.css`). `src/styles.css` is plain, hand-written CSS — all layout, spacing, typography, and variant custom properties live there as namespaced `.toast-*` rules. There is no Tailwind build step and no `src/tw.css`. Consumers need no CSS tooling of their own.
 
 ## Testing rules
 
